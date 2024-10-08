@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEX Gradient</title>
+    <style>
+        @font-face {
+            font-family: 'MinecraftFont';
+            src: url('Monocraft.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212; /* Cor de fundo escura */
+            color: #E0E0E0; /* Cor do texto clara */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #FFEA00; /* Cor do título */
+        }
+
+        .form-section {
+            width: 100%;
+            max-width: 600px; /* Largura máxima para responsividade */
+            margin-bottom: 20px;
+            background-color: #1E1E1E; /* Fundo das seções */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 95%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Borda do textarea */
+            background-color: #2A2A2A; /* Fundo do textarea */
+            color: #E0E0E0; /* Texto do textarea */
+            resize: none; /* Desabilita redimensionamento */
+        }
+
+        input[type="color"],
+        input[type="text"],
+        select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #444; /* Borda dos inputs */
+            background-color: #2A2A2A; /* Fundo dos inputs */
+            color: #E0E0E0; /* Texto dos inputs */
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        #output, #preview {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #444; /* Borda da saída */
+            background-color: #1E1E1E; /* Fundo da saída */
+            border-radius: 8px;
+            white-space: pre-wrap;
+            overflow-wrap: break-word; /* Quebra de linha */
+        }
+
+        #output {
+            font-size: 20px; /* Tamanho da fonte */
+            color: #FFEA00; /* Cor da saída */
+        }
+
+        #preview {
+            font-family: 'MinecraftFont', monospace;
+            font-size: 24px; /* Tamanho da pré-visualização */
+        }
+
+        h6 {
+            margin-top: 20px;
+            color: #A0A0A0; /* Cor do autor */
+        }
+
+        /* Estilo do botão */
+        button {
+            background-color: #FFEA00; /* Cor de fundo do botão */
+            color: #121212; /* Cor do texto do botão */
+            border: none; /* Remove borda padrão */
+            border-radius: 5px; /* Borda arredondada */
+            padding: 10px 20px; /* Espaçamento interno */
+            cursor: pointer; /* Muda o cursor ao passar o mouse */
+            font-size: 16px; /* Tamanho da fonte do botão */
+        }
+
+        button:hover {
+            background-color: #FFD700; /* Cor do botão ao passar o mouse */
+        }
+
+        button:disabled {
+            background-color: #555; /* Cor do botão desativado */
+            cursor: not-allowed; /* Cursor ao passar o mouse sobre botão desativado */
+        }
+    </style>
+</head>
+<body>
+
+    <h2>In-Game Gradient Creator</h2>
+
+    <div class="form-section">
+        <label for="inputText">Text:</label>
+        <textarea id="inputText" rows="3" placeholder="Type your text here..." oninput="generateGradient()"></textarea>
+    </div>
+
+    <div class="form-section">
+        <label for="startColor">Initial color:</label>
+        <input type="color" id="startColor" value="#ff0000" onchange="syncStartHex()">
+        <label for="endColor">Final color:</label>
+        <input type="color" id="endColor" value="#0000ff" onchange="syncEndHex()">
+    </div>
+	
+	<div id="preview"></div>
+	
+    <div class="form-section">
+        <label for="manualStartHex">Initial color (HEX):</label>
+        <input type="text" id="manualStartHex" value="#ff0000" oninput="syncStartColorPicker()">
+        <label for="manualEndHex">Final color (HEX):</label>
+        <input type="text" id="manualEndHex" value="#0000ff" oninput="syncEndColorPicker()">
+    </div>
+
+    <div class="form-section">
+        <label for="format">Output format:</label>
+        <select id="format" onchange="generateGradient()">
+            <option value="cmi">{#&1&2&3&4&5&6}$f</option>
+            <option value="xy">&x&1&2&3&4&5&6$f</option>
+            <option value="rgb">&#rrggbb$f</option>
+        </select>
+    </div>
+
+    <div class="form-section">
+        <label>Formatações:</label>
+        <input type="checkbox" id="bold" onchange="generateGradient()"> Bold (&l)<br>
+        <input type="checkbox" id="italic" onchange="generateGradient()"> Italic (&o)<br>
+        <input type="checkbox" id="underline" onchange="generateGradient()"> Underline (&n)<br>
+        <input type="checkbox" id="strikethrough" onchange="generateGradient()"> Strikethrough (&m)<br>
+    </div>
+
+    <div class="form-section">
+        <label for="commandPrefix">Command:</label>
+        <select id="commandPrefix" onchange="updateButtonState()">
+            <option value="none">None</option>
+            <option value="/bc">/bc</option>
+            <option value="/ie lore add">/ie lore add</option>
+            <option value="/ie rename">/ie rename</option>
+        </select>
+    </div>
+
+    <button id="sendButton" disabled>Send Command</button> <!-- Botão desabilitado inicialmente -->
+	<h6>by dolozimm</h6>
+    <div id="output"></div>
+
+    <script>
+        // Funções JavaScript permanecem inalteradas
+        function syncStartHex() {
+            let startColor = document.getElementById("startColor").value;
+            document.getElementById("manualStartHex").value = startColor;
+            generateGradient();
+        }
+
+        function syncEndHex() {
+            let endColor = document.getElementById("endColor").value;
+            document.getElementById("manualEndHex").value = endColor;
+            generateGradient();
+        }
+
+        function syncStartColorPicker() {
+            let hex = document.getElementById("manualStartHex").value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                document.getElementById("startColor").value = hex;
+                generateGradient();
+            }
+        }
+
+        function syncEndColorPicker() {
+            let hex = document.getElementById("manualEndHex").value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                document.getElementById("endColor").value = hex;
+                generateGradient();
+            }
+        }
+
+        function hexToRgb(hex) {
+            let bigint = parseInt(hex.replace("#", ""), 16);
+            return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function generateGradientColors(startColor, endColor, steps) {
+            let startRGB = hexToRgb(startColor);
+            let endRGB = hexToRgb(endColor);
+            let gradient = [];
+
+            for (let i = 0; i < steps; i++) {
+                let r = Math.round(startRGB.r + (endRGB.r - startRGB.r) * (i / (steps - 1)));
+                let g = Math.round(startRGB.g + (endRGB.g - startRGB.g) * (i / (steps - 1)));
+                let b = Math.round(startRGB.b + (endRGB.b - startRGB.b) * (i / (steps - 1)));
+                gradient.push(rgbToHex(r, g, b));
+            }
+
+            return gradient;
+        }
+
+        function getFormatFlags() {
+            let format = "";
+            if (document.getElementById("bold").checked) format += "&l";
+            if (document.getElementById("italic").checked) format += "&o";
+            if (document.getElementById("underline").checked) format += "&n";
+            if (document.getElementById("strikethrough").checked) format += "&m";
+            return format;
+        }
+
+        function formatHex(hex, formatType, formatting) {
+            hex = hex.replace("#", "").toUpperCase();
+            switch (formatType) {
+                case "cmi":
+                    return `{#${hex}}${formatting}`;
+                case "xy":
+                    return `&x&${hex[0]}&${hex[1]}&${hex[2]}&${hex[3]}&${hex[4]}&${hex[5]}${formatting}`;
+                case "rgb":
+                    return `&#${hex}${formatting}`;
+            }
+        }
+
+        function generateGradient() {
+            let text = document.getElementById("inputText").value;
+            let startColor = document.getElementById("manualStartHex").value || document.getElementById("startColor").value;
+            let endColor = document.getElementById("manualEndHex").value || document.getElementById("endColor").value;
+            let formatType = document.getElementById("format").value;
+            let formatting = getFormatFlags();
+
+            if (!text) {
+                document.getElementById("output").textContent = "";
+                document.getElementById("preview").innerHTML = "";
+                return;
+            }
+
+            let colors = generateGradientColors(startColor, endColor, text.length);
+            let output = "";
+
+            let commandPrefix = document.getElementById("commandPrefix").value;
+            if (commandPrefix !== "none") {
+                output += commandPrefix + " ";
+            }
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+
+                if (char === ' ' && !document.getElementById("underline").checked && !document.getElementById("strikethrough").checked) {
+                    output += char;
+                } else {
+                    let hexFormatted = formatHex(colors[i], formatType, formatting);
+                    output += hexFormatted + char;
+                }
+            }
+
+            // Remove the extra space if a command prefix is used
+            if (commandPrefix !== "none") {
+                output = output.trim(); // Remove any trailing space
+            }
+
+            document.getElementById("output").textContent = output;
+            updatePreview(text, colors, formatting);
+            updateButtonState(); // Atualiza o estado do botão após gerar o comando
+        }
+
+        function updatePreview(text, colors, formatting) {
+            let previewElement = document.getElementById("preview");
+            previewElement.innerHTML = "";
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let span = document.createElement("span");
+
+                span.style.color = colors[i];
+				span.style.fontFamily = 'MinecraftFont, monospace';
+                span.style.fontWeight = document.getElementById("bold").checked ? "bold" : "normal";
+                span.style.fontStyle = document.getElementById("italic").checked ? "italic" : "normal";
+                span.style.textDecoration = document.getElementById("underline").checked ? "underline" : (document.getElementById("strikethrough").checked ? "line-through" : "none");
+
+                span.textContent = char;
+                previewElement.appendChild(span);
+            }
+        }
+
+        // Adicionando a funcionalidade do botão
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const command = document.getElementById("output").textContent; // Obtém o comando formatado
+            const prefix = document.getElementById('commandPrefix').value;
+
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `command=${encodeURIComponent(command)}&prefix=${encodeURIComponent(prefix)}`,
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('output').textContent = data;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('output').textContent = 'Ocorreu um erro ao enviar o comando.';
+            });
+        });
+
+        // Atualiza o estado do botão baseado no comando selecionado
+        function updateButtonState() {
+            const commandPrefix = document.getElementById("commandPrefix").value;
+            const command = document.getElementById("output").textContent;
+
+            // O botão só estará habilitado se o comandoPrefix não for "none" e o comando não estiver vazio
+            document.getElementById('sendButton').disabled = (commandPrefix === "none" || !command.trim());
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEX Gradient</title>
+    <style>
+        @font-face {
+            font-family: 'MinecraftFont';
+            src: url('Monocraft.ttf') format('truetype');
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212; 
+            color: #E0E0E0; 
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #FFEA00;
+        }
+
+        .form-section {
+            width: 100%;
+            max-width: 600px; 
+            margin-bottom: 20px;
+            background-color: #1E1E1E; 
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        textarea {
+            width: 95%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444; 
+            background-color: #2A2A2A; 
+            color: #E0E0E0; 
+            resize: none; 
+        }
+
+        input[type="color"],
+        input[type="text"],
+        select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #444; 
+            background-color: #2A2A2A; 
+            color: #E0E0E0; 
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        #output, #preview {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #444;
+            background-color: #1E1E1E; 
+            border-radius: 8px;
+            white-space: pre-wrap;
+            overflow-wrap: break-word; 
+        }
+
+        #output {
+            font-size: 20px; 
+            color: #FFEA00;
+        }
+
+        #preview {
+            font-family: 'MinecraftFont', monospace;
+            font-size: 24px; 
+        }
+
+        h6 {
+            margin-top: 20px;
+            color: #A0A0A0;
+        }
+
+        
+        button {
+            background-color: #FFEA00; 
+            color: #121212; 
+            border: none; 
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px; 
+        }
+
+        button:hover {
+            background-color: #FFD700; 
+        }
+
+        button:disabled {
+            background-color: #555; 
+            cursor: not-allowed; 
+        }
+    </style>
+</head>
+<body>
+
+    <h2>In-Game Gradient Creator</h2>
+
+    <div class="form-section">
+        <label for="inputText">Text:</label>
+        <textarea id="inputText" rows="3" placeholder="Type your text here..." oninput="generateGradient()"></textarea>
+    </div>
+
+    <div class="form-section">
+        <label for="startColor">Initial color:</label>
+        <input type="color" id="startColor" value="#ff0000" onchange="syncStartHex()">
+        <label for="endColor">Final color:</label>
+        <input type="color" id="endColor" value="#0000ff" onchange="syncEndHex()">
+    </div>
+	
+	<div id="preview"></div>
+	
+    <div class="form-section">
+        <label for="manualStartHex">Initial color (HEX):</label>
+        <input type="text" id="manualStartHex" value="#ff0000" oninput="syncStartColorPicker()">
+        <label for="manualEndHex">Final color (HEX):</label>
+        <input type="text" id="manualEndHex" value="#0000ff" oninput="syncEndColorPicker()">
+    </div>
+
+    <div class="form-section">
+        <label for="format">Output format:</label>
+        <select id="format" onchange="generateGradient()">
+            <option value="cmi">{#&1&2&3&4&5&6}$f</option>
+            <option value="xy">&x&1&2&3&4&5&6$f</option>
+            <option value="rgb">&#rrggbb$f</option>
+        </select>
+    </div>
+
+    <div class="form-section">
+        <label>Formatting:</label>
+        <input type="checkbox" id="bold" onchange="generateGradient()"> Bold (&l)<br>
+        <input type="checkbox" id="italic" onchange="generateGradient()"> Italic (&o)<br>
+        <input type="checkbox" id="underline" onchange="generateGradient()"> Underline (&n)<br>
+        <input type="checkbox" id="strikethrough" onchange="generateGradient()"> Strikethrough (&m)<br>
+    </div>
+
+    <div class="form-section">
+        <label for="commandPrefix">Command:</label>
+        <select id="commandPrefix" onchange="updateButtonState()">
+            <option value="none">None</option>
+            <option value="bc">/bc</option>
+            <option value="ie lore add">/ie lore add</option>
+            <option value="ie rename">/ie rename</option>
+        </select>
+    </div>
+
+    <button id="sendButton" disabled>Send Command</button>
+	<h6>by dolozimm</h6>
+    <div id="output"></div>
+
+    <script>
+        function syncStartHex() {
+            let startColor = document.getElementById("startColor").value;
+            document.getElementById("manualStartHex").value = startColor;
+            generateGradient();
+        }
+
+        function syncEndHex() {
+            let endColor = document.getElementById("endColor").value;
+            document.getElementById("manualEndHex").value = endColor;
+            generateGradient();
+        }
+
+        function syncStartColorPicker() {
+            let hex = document.getElementById("manualStartHex").value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                document.getElementById("startColor").value = hex;
+                generateGradient();
+            }
+        }
+
+        function syncEndColorPicker() {
+            let hex = document.getElementById("manualEndHex").value;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                document.getElementById("endColor").value = hex;
+                generateGradient();
+            }
+        }
+
+        function hexToRgb(hex) {
+            let bigint = parseInt(hex.replace("#", ""), 16);
+            return {r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255};
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function generateGradientColors(startColor, endColor, steps) {
+            let startRGB = hexToRgb(startColor);
+            let endRGB = hexToRgb(endColor);
+            let gradient = [];
+
+            for (let i = 0; i < steps; i++) {
+                let r = Math.round(startRGB.r + (endRGB.r - startRGB.r) * (i / (steps - 1)));
+                let g = Math.round(startRGB.g + (endRGB.g - startRGB.g) * (i / (steps - 1)));
+                let b = Math.round(startRGB.b + (endRGB.b - startRGB.b) * (i / (steps - 1)));
+                gradient.push(rgbToHex(r, g, b));
+            }
+
+            return gradient;
+        }
+
+        function getFormatFlags() {
+            let format = "";
+            if (document.getElementById("bold").checked) format += "&l";
+            if (document.getElementById("italic").checked) format += "&o";
+            if (document.getElementById("underline").checked) format += "&n";
+            if (document.getElementById("strikethrough").checked) format += "&m";
+            return format;
+        }
+
+        function formatHex(hex, formatType, formatting) {
+            hex = hex.replace("#", "").toUpperCase();
+            switch (formatType) {
+                case "cmi":
+                    return `{#${hex}}${formatting}`;
+                case "xy":
+                    return `&x&${hex[0]}&${hex[1]}&${hex[2]}&${hex[3]}&${hex[4]}&${hex[5]}${formatting}`;
+                case "rgb":
+                    return `&#${hex}${formatting}`;
+            }
+        }
+
+        function generateGradient() {
+            let text = document.getElementById("inputText").value;
+            let startColor = document.getElementById("manualStartHex").value || document.getElementById("startColor").value;
+            let endColor = document.getElementById("manualEndHex").value || document.getElementById("endColor").value;
+            let formatType = document.getElementById("format").value;
+            let formatting = getFormatFlags();
+
+            if (!text) {
+                document.getElementById("output").textContent = "";
+                document.getElementById("preview").innerHTML = "";
+                return;
+            }
+
+            let colors = generateGradientColors(startColor, endColor, text.length);
+            let output = "";
+
+            let commandPrefix = document.getElementById("commandPrefix").value;
+            if (commandPrefix !== "none") {
+                output += commandPrefix + " ";
+            }
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+
+                if (char === ' ' && !document.getElementById("underline").checked && !document.getElementById("strikethrough").checked) {
+                    output += char;
+                } else {
+                    let hexFormatted = formatHex(colors[i], formatType, formatting);
+                    output += hexFormatted + char;
+                }
+            }
+
+       
+            if (commandPrefix !== "none") {
+                output = output.trim(); 
+            }
+
+            document.getElementById("output").textContent = output;
+            updatePreview(text, colors, formatting);
+            updateButtonState(); 
+        }
+
+        function updatePreview(text, colors, formatting) {
+            let previewElement = document.getElementById("preview");
+            previewElement.innerHTML = "";
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let span = document.createElement("span");
+
+                span.style.color = colors[i];
+				span.style.fontFamily = 'MinecraftFont, monospace';
+                span.style.fontWeight = document.getElementById("bold").checked ? "bold" : "normal";
+                span.style.fontStyle = document.getElementById("italic").checked ? "italic" : "normal";
+                span.style.textDecoration = document.getElementById("underline").checked ? "underline" : (document.getElementById("strikethrough").checked ? "line-through" : "none");
+
+                span.textContent = char;
+                previewElement.appendChild(span);
+            }
+        }
+
+
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const command = document.getElementById("output").textContent;
+            const prefix = document.getElementById('commandPrefix').value;
+
+            fetch('/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `command=${encodeURIComponent(command)}&prefix=${encodeURIComponent(prefix)}`,
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('output').textContent = data;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                document.getElementById('output').textContent = 'Ocorreu um erro ao enviar o comando.';
+            });
+        });
+
+        function updateButtonState() {
+            const commandPrefix = document.getElementById("commandPrefix").value;
+            const command = document.getElementById("output").textContent;
+
+            document.getElementById('sendButton').disabled = (commandPrefix === "none" || !command.trim());
+        }
+    </script>
+
+</body>
+</html>

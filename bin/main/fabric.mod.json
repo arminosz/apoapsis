@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "apoapsis-client",
+	"version": "${version}",
+	"name": "Apoapsis",
+	"description": "Multi-use Utility mod",
+	"authors": [
+		"dolozimm"
+	],
+	"contact": {
+		"sources": "https://github.com/dolozimn/apoapsis-client"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/apoapsis-client/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dolozimm.apoapsis.ApoapsisClient"
+		],
+		"client": [
+			"dolozimm.apoapsis.ApoapsisClientClient"
+		]
+	},
+	"mixins": [
+		"apoapsis-client.mixins.json",
+		{
+			"config": "apoapsis-client.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.5",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
