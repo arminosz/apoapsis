@@ -29,8 +29,6 @@
 3. Drop the `.jar` file into your `/mods/` folder
 4. Launch Minecraft with the **Fabric Loader** and enjoy making colorful commands!
 
-<sub>Disclaimer: While the mod helps you make colorful texts, it won't stop you from sending questionable messages. Use responsibly :o</sub>
-
 <sub>PS: For devs, you can easily import this source code as a project, just take in mind it was made in Eclipse </sub>
 
 
