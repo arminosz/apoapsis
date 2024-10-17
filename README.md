@@ -4,6 +4,7 @@
 > **Requires:**  
 > - Minecraft **1.21.1**
 > - Fabric API **0.102.0** or higher
+> - Fabric 0.16.7
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1-brightgreen) ![Fabric API](https://img.shields.io/badge/Fabric--API-0.102.0%2B-blue)
 
