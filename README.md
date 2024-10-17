@@ -9,14 +9,14 @@
 
 ## 💡 What Does It Do?
 
-- Opens a local website with the command `/apoapsis`
+- Opens a interface with the Right shift keybind (changeable)
 - Lets you **customize text** and apply color gradients
 - Choose a **prefix (command)** for your text, if needed
 - Click the **"Send command"** button, and it will generate and send the complete command in-game automatically
 
 ## 📋 How to Use
 
-1. Run the `/apoapsis` command to open the interface in your web browser
+1. Press Right shift to open the interface in-game
 2. **Enter your text** in the text field
 3. **Pick your colors** for the gradient effect (either by the color picker or ready-to-use hex)
 4. Choose a **prefix** (for example, `/bc`, `/ie rename`, etc.)
@@ -25,10 +25,8 @@
 ## ⚙️ Installation
 
 1. **Download** the mod from [releases](https://github.com/arminosz/apoapsis/releases)
-2. Make sure you have **Fabric API 0.102.0** or higher
+2. Make sure you have **Fabric API 0.102.0**  or higher installed (and fabric itself)
 3. Drop the `.jar` file into your `/mods/` folder
 4. Launch Minecraft with the **Fabric Loader** and enjoy
 
 <sub>PS: For devs, this was wrote the code in Eclipse, so when importing to your IDE, use the Eclipse import method</sub>
-
-
